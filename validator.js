@@ -3,6 +3,8 @@
 // Đối tương Validator
 function Validator(options) {
 
+    var selectorRules = {};
+
     // Func thực hiện việc validate
     function validate(inputElement, rule) {
         // Để có thể in ra message lỗi thì phải select đúng thẻ span (là thẻ để in ra message lỗi) của từng ô input, nhưng có nhiều thẻ span có chung class
@@ -47,6 +49,10 @@ function Validator(options) {
 
     if(formElement) {
         options.rules.forEach(function(rule) {
+
+            // Lưu lại các rules cho mỗi input
+            selectorRules[rule.selector] = rule.test;
+
             // Có thể in ra xem nó lấy các selector của các rule như thế nào
             // console.log(rule.selector);
 
@@ -78,38 +84,48 @@ function Validator(options) {
 // Nguyên tắc:
 // Khi có lỗi => trả ra message lỗi
 // Khi ko ó lỗi => ko trả ra gì (undefined)
-Validator.isRequired = function(selector) {
+Validator.isRequired = function(selector, message) {
     return {
         selector: selector,
         test: function(value) {
             console.log(value);
             // Nếu có value thì trả về undefined, ko có value thì trả ra messege lổi
             // .trim() để khi trường hợp User nhập toàn dấu cách, nếu ko có trim thì khi User nhập dấu cách nó cũng báo là cóa value
-            return value.trim() ? undefined : 'Vui lòng nhập thông tin'
+            return value.trim() ? undefined : message || 'Vui lòng nhập thông tin'
         }
     };
 }
 
-Validator.isEmail = function(selector) {
+Validator.isEmail = function(selector, message) {
     return {
         selector: selector,
         test: function(value) {
             // Search 'javascript email regex' để lấy đoạn code sử dụng biểu thức chính qui kiểm tra xem có phải là email ko
             var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
             // Nếu có nhập value và đúng cú pháp email thì trả về undefined, nếu ko đúng cú pháp hoặc ko nhập thì báo lỗi
-            return regex.test(value) ? undefined : 'Chưa đúng cú pháp email';
+            return regex.test(value) ? undefined : message || 'Chưa đúng cú pháp email';
 
         }
     };
 }
 
 // Rule nhập tối thiểu 
-Validator.minLength = function(selector, min) {
+Validator.minLength = function(selector, min, message) {
     return {
         selector: selector,
         test: function(value) {      
-            return value.length >= min ? undefined : `Vui lòng nhập tối thiểu ${min} ký tự`;
+            return value.length >= min ? undefined : message || `Vui lòng nhập tối thiểu ${min} ký tự`;
 
+        }
+    };
+}
+
+// Rule nhập lại password
+Validator.isConfirmed = function(selector, getConfirmValue, message) {
+    return {
+        selector: selector,
+        test: function(value) {      
+            return value === getConfirmValue() ? undefined : message || 'Giá trị nhập lại chưa khớp'; 
         }
     };
 }

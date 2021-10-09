@@ -30,6 +30,7 @@
       
           <div class="form-group">
             <label for="password" class="form-label">Mật khẩu</label>
+            <!-- type="password" cho nó ẩn đi -->
             <input id="password" name="password" type="password" placeholder="Nhập mật khẩu" class="form-control">
             <span class="form-message"></span>
           </div>
@@ -56,10 +57,18 @@
             errorSelector: '.form-message',
             rules: [
                 // Đối số của 2 hàm truyền vào cái gì thì trong file validator.js nhận lại cái đó
-                Validator.isRequired('#fullname'),
+                Validator.isRequired('#fullname', 'Vui lòng nhập tên đầy đủ'),
+
+                Validator.isRequired('#email'),
                 Validator.isEmail('#email'),
                 // minLenght 6 ký tự
                 Validator.minLength('#password', 6),
+
+                Validator.isRequired('#password_confirmation'),
+                Validator.isConfirmed('#password_confirmation', function() {
+                  // Mỗi lần rule dc chạy thì nó sẽ lấy value #password so sánh với value #password_confirmation
+                  return document.querySelector('#form-1 #password').value;
+                }, 'Mật khẩu nhập lại không chính xác'),
             ]
         });
     </script>
