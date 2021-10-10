@@ -18,9 +18,22 @@ function Validator(options) {
         // console.log('blur' + rule.selector)
 
         // inputElement.value là input User nhập vào và truyền vào test func
-        var errorMessage = rule.test(inputElement.value);
+        var errorMessage;
         // Có thể in ra để xem
         // console.log(errorMessage);  
+
+
+        // Nó sẽ thu lại chính những rule của chính cái field mà User click vào và blur ra ngoài
+        var rules = selectorRules[rule.selector];
+        // console.log(rules);
+
+
+        // Lặp qua từng rule và kiểm tra, nếu có lỗi thì dừng việc kiểm tra. Ví dụ #email có 2 rule (isRequired và isEmail), nếu mà nó lặp các rule của #emial mà thấy isRequired có lỗi là dừng luôn, ko cần kiểm tra isEmail nữa
+        for(var i=0; i<rules.length; ++i) {
+            errorMessage = rules[i](inputElement.value);
+            // Check nếu chỉ cần có 1 rule errorMessage thôi thì sẽ thoát khỏi vòng lặp
+            if(errorMessage) break;
+        }
 
         if(errorMessage) {
             // Nếu có lỗi thì innerText cho nó = message lỗi
@@ -33,6 +46,8 @@ function Validator(options) {
             // Nếu ko lỗi thì xóa class 'invalid' để cho nó hết màu đỏ
             inputElement.parentElement.classList.remove('invalid');
         }
+        // phủ định ngược lại
+        return !errorMessage;
 
     }
 
@@ -48,6 +63,59 @@ function Validator(options) {
     // console.log(options.rules);
 
     if(formElement) {
+        // Khi nhấn nút submit thì ta nên bò đi hành vi mặt định của nút submit
+        formElement.onsubmit = function(e) {
+            // Bỏ hành vi mặt định
+            e.preventDefault();
+
+            var isFormValid = true;
+
+
+            // Lặp qua từng rule và validate luôn, khi ta click submit button thì mà chưa nhập bất cứ field nào hoặc chỉ nhập 1 vài field thì nó sẽ thực hiện validate các field chưa đạt yêu cầu để nhấn submit, chứ ko phải chỉ validate khi User ko nhập hoăc nhập sai từng field 
+            options.rules.forEach(function(rule) {
+                var inputElement = formElement.querySelector(rule.selector);
+                var isValid = validate(inputElement, rule);
+                // Nếu chỉ cần có 1 field ko phải là isValid thì
+                if(!isValid) {
+                    isFormValid = false;
+                }
+            });
+
+
+
+            
+
+            if(isFormValid) {
+                // Trường hợp submit với Javascript
+                if(typeof options.onSubmit === 'function') {
+
+                    // Lấy tất cả inputs ở trang thái enable
+                    // Select tất cả những thẻ có attribute là 'name' và ko có attribue là disabled
+                    // Tại sao lại ko lấy những field có attribute là 'disabled' vì trong thực tế sẽ có những field ta thêm vào attribute 'disable' để User ko tương tác dc
+                    // Nhưng đa phần các trường hợp là chỉ lấy attribute 'name', ko cần not([disabled])      ([name]:not([disabled]))
+                    var enableInputs =  formElement.querySelectorAll('[name]');
+                    // console.log(enableInputs)
+
+                    // 'enableInputs' đang là dạng NodeList chứa tất cả thẻ input mà nó lấy dc, nên ko sử dụng dc các methhod của Array, nên ta convert nó sang Array để dùng
+                    // Ta nhận vào tất cả value của ta, các inputElement
+                    var formValues = Array.from(enableInputs).reduce(function(values, input) {
+                    // Gán input.value cho Object 'values' và return ra 'values'
+                    return (values[input.name] = input.value) && values;
+                    }, {});
+
+
+                    options.onSubmit(formValues);
+                }
+                // Trường hợp submit với hành vi mặc định
+                else {
+                    formElement.submit();
+                }
+            }
+        }
+
+
+
+        // Lặp qua mỗi rule và xữ lý (lắng nghe sự kiện blur, input, ...)
         options.rules.forEach(function(rule) {
 
             // Lưu lại tất cả rules cho mỗi input

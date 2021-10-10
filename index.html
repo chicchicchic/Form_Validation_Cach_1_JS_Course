@@ -59,17 +59,23 @@
                 // Đối số của 2 hàm truyền vào cái gì thì trong file validator.js nhận lại cái đó
                 Validator.isRequired('#fullname', 'Vui lòng nhập tên đầy đủ'),
 
-                Validator.isRequired('#email'),
+                // Validator.isRequired('#email'), (bỏ đi vì thêm rule vào cũng #email để cho biết là đoan JS ta viết là nó lặp qua từng rule của #email, sau này có thêm bao nhiu rule đi nữa thì nó cũng lặp tuần tự như vậy)
                 Validator.isEmail('#email'),
                 // minLenght 6 ký tự
                 Validator.minLength('#password', 6),
 
-                Validator.isRequired('#password_confirmation'),
+                Validator.isRequired('#password_confirmation'), 
                 Validator.isConfirmed('#password_confirmation', function() {
                   // Mỗi lần rule dc chạy thì nó sẽ lấy value #password so sánh với value #password_confirmation
                   return document.querySelector('#form-1 #password').value;
                 }, 'Mật khẩu nhập lại không chính xác'),
-            ]
+            ],
+            // Mong muốn là nhập đầy đủ các field thì sẽ in ra tất cả data của form mà User nhập vào 
+            // Nếu ko có onSubmit này thì nó sẽ rơi vào trường hợp submit với hành vi mặt định (bên file 'validator.js' có đoạn phân theo trường hợp), vì trong thực tế ko phải lúc nào ngta cũng submit theo JS mà đôi khi ngta sẽ muốn submit theo hành vi mặc định
+            onSubmit: function(data) {
+              // Sau này sẽ Call API ở đây
+              console.log(data);
+            }
         });
     </script>
 </body>
