@@ -11,37 +11,102 @@
     <div class="main">
 
         <form action="" method="POST" class="form" id="form-1">
-          <h3 class="heading">Thành viên đăng ký</h3>
-          <p class="desc">Form validation</p>
+          <h3 class="heading">Register Form</h3>
+          <p class="desc">Register Form Validation</p>
       
           <div class="spacer"></div>
       
           <div class="form-group">
-            <label for="fullname" class="form-label">Tên đầy đủ</label>
-            <input id="fullname" name="fullname" type="text" placeholder="VD: Khanh Bùi" class="form-control">
+            <label for="fullname" class="form-label">Fullname</label>
+            <input id="fullname" name="fullname" type="text" placeholder="Ex: Khanh Bùi" class="form-control">
             <span class="form-message"></span>
           </div>
       
           <div class="form-group">
             <label for="email" class="form-label">Email</label>
-            <input id="email" name="email" type="text" placeholder="VD: email@domain.com" class="form-control">
+            <input id="email" name="email" type="text" placeholder="Ex: email@domain.com" class="form-control">
             <span class="form-message"></span>
           </div>
       
           <div class="form-group">
-            <label for="password" class="form-label">Mật khẩu</label>
+            <label for="password" class="form-label">Password</label>
             <!-- type="password" cho nó ẩn đi -->
-            <input id="password" name="password" type="password" placeholder="Nhập mật khẩu" class="form-control">
+            <input id="password" name="password" type="password" placeholder="Enter password" class="form-control">
             <span class="form-message"></span>
           </div>
       
           <div class="form-group">
-            <label for="password_confirmation" class="form-label">Nhập lại mật khẩu</label>
-            <input id="password_confirmation" name="password_confirmation" placeholder="Nhập lại mật khẩu" type="password" class="form-control">
+            <label for="password_confirmation" class="form-label">Confirm Password</label>
+            <input id="password_confirmation" name="password_confirmation" placeholder="Enter confirm password" type="password" class="form-control">
+            <span class="form-message"></span>
+          </div>
+
+
+
+          <!-- Trường hợp input là file -->
+          <div class="form-group">
+            <label for="avatar" class="form-label">Profile picture</label>
+            <input id="avatar" name="avatar" type="file" class="form-control">
+            <span class="form-message"></span>
+          </div>
+
+          <!-- Trường hợp input là select option -->
+          <div class="form-group">
+            <label for="province" class="form-label">Area</label>
+            <select id="province" name="province" class="form-control">
+              <option value="">--Choose your area--</option>
+              <option value="hn">Hà Nội</option>
+              <option value="hcm">Hồ Chí Minh</option>
+              <option value="dn">Đà Nẵng</option>
+
+            </select>
+            <span class="form-message"></span>
+          </div>
+
+          <!-- Trường hợp input là checkbox hoặc radio -->
+          <!-- tìm hiểu type="checkbox" và type="radio" -->
+          <div class="form-group">
+            <label for="gender" class="form-label">Sex/gender</label>
+            <div>
+              <input name="gender" type="checkbox" value="male" class="form-control">
+              Male
+            </div>
+            <div>
+              <input name="gender" type="checkbox" value="female" class="form-control">
+              Female
+            </div>
+            <div>
+              <input name="gender" type="checkbox" value="other" class="form-control">
+              Other
+            </div>
             <span class="form-message"></span>
           </div>
       
-          <button class="form-submit">Đăng ký</button>
+          <button class="form-submit">Register</button>
+        </form>
+
+
+        <!-- Form Đăng nhập (form thứ 2) -->
+        <form action="" method="POST" class="form" id="form-2">
+          <h3 class="heading">Login Form</h3>
+          <p class="desc">Login Form Validation</p>
+      
+          <div class="spacer"></div>
+      
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" name="email" type="text" placeholder="Ex: email@domain.com" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <!-- type="password" cho nó ẩn đi -->
+            <input id="password" name="password" type="password" placeholder="Enter password" class="form-control">
+            <span class="form-message"></span>
+          </div>
+      
+          <button class="form-submit">Login</button>
         </form>
       
       </div>
@@ -54,6 +119,7 @@
         // Mong muốn sữ dụng nó trong tương lai
         Validator({
             form: '#form-1',
+            formGroupSelector: '.form-group',
             errorSelector: '.form-message',
             rules: [
                 // Đối số của 2 hàm truyền vào cái gì thì trong file validator.js nhận lại cái đó
@@ -69,9 +135,31 @@
                   // Mỗi lần rule dc chạy thì nó sẽ lấy value #password so sánh với value #password_confirmation
                   return document.querySelector('#form-1 #password').value;
                 }, 'Mật khẩu nhập lại không chính xác'),
+
+
+                Validator.isRequired('#avatar'),
+                Validator.isRequired('#province'),
+                Validator.isRequired('input[name="gender"]')
             ],
             // Mong muốn là nhập đầy đủ các field thì sẽ in ra tất cả data của form mà User nhập vào 
             // Nếu ko có onSubmit này thì nó sẽ rơi vào trường hợp submit với hành vi mặt định (bên file 'validator.js' có đoạn phân theo trường hợp), vì trong thực tế ko phải lúc nào ngta cũng submit theo JS mà đôi khi ngta sẽ muốn submit theo hành vi mặc định
+            onSubmit: function(data) {
+              // Sau này sẽ Call API ở đây
+              console.log(data);
+            }
+        });
+
+
+        // Validate của form 2 (Đăng nhập)
+        Validator({
+            form: '#form-2',
+            formGroupSelector: '.form-group',
+            errorSelector: '.form-message',
+            rules: [
+                Validator.isEmail('#email'),
+                Validator.minLength('#password', 6),
+            ],
+            
             onSubmit: function(data) {
               // Sau này sẽ Call API ở đây
               console.log(data);
