@@ -50,8 +50,14 @@ function Validator(options) {
     if(formElement) {
         options.rules.forEach(function(rule) {
 
-            // Lưu lại các rules cho mỗi input
-            selectorRules[rule.selector] = rule.test;
+            // Lưu lại tất cả rules cho mỗi input
+            if( Array.isArray(selectorRules[rule.selector])) {
+                // Trong lần 2 chạy sẽ push rule tiếp theo vào đây vì trước đó (phần else) nó đã là Array rồi nên lần thứ 2 điều kiện (là Array) sẽ hợp lệ, ta chỉ cần push cái rule tiếp theo vào 
+                selectorRules[rule.selector].push(rule.test);
+            }else {
+                // Trong lần đầu chạy nếu nó ko phải là Array thì sẽ gán cho nó bằng 1 Array có phần tữ đầu tiên là 
+                selectorRules[rule.selector] = [rule.test];
+            }
 
             // Có thể in ra xem nó lấy các selector của các rule như thế nào
             // console.log(rule.selector);
@@ -72,6 +78,9 @@ function Validator(options) {
                 }
             }
         });
+
+        // Ra khỏi vòng for, selectorRules sẽ là 1 Object lưu lại những rule của thẻ input, in ra và sổ xuống sẽ thấy #email và #password_confirmation đã có đầy d8u3 rule của riêng từng input chứ ko còn ghi đè thành 1 rule như trước
+        // console.log(selectorRules);
 
     }
 }
